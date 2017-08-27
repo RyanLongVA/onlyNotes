@@ -2,7 +2,6 @@ import sys
 import subprocess
 import optparse
 import os
-import pdb
 
 def openCount():
     while True:
