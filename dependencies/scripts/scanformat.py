@@ -6,7 +6,7 @@ import re
 def main():
     if len(sys.argv) <= 1:
         print "\nSpecify the arguments:\n"
-        print "python scanformat.py dataDestination/target"
+        print "python scanformat.py <dataDestination/target>"
         exit()
     try:
         ipFile = open(sys.argv[1]+'.ips', 'r')
@@ -21,14 +21,11 @@ def main():
     # scan formatting
     scanContent = scanFile.readlines()
     scanContent = [x.strip() for x in scanContent]
-    print "Formatting scan"
     for a in scanContent:
         if a.startswith('Host:'):
             a = a.split('()')
             fhost = a[0].replace('Host: ', '').replace(' ', '')
             fports = a[1].replace('Ports: ', '').replace('Port: ', '')
-            print "[+] Host Found: " + fhost
-            print "\t\t Port: " + fports
             if fhost not in hosts:
                 hosts[fhost] = {'ports': [fports], 'cnames': []}
             else:
@@ -54,10 +51,23 @@ def main():
                 if a[1] == ba[0]:
                     # pdb.set_trace()
                     should_restart = True
-                    hosts[b]['cnames'] += a[0]
+                    hosts[b]['cnames'] += [a[0]]
                     break
+    # for now we're just going to assume this is creating everything from afresh, and not checking for existing notes and modifying them... future plan
     for a in hosts:
-        print "\n\n"
-        print hosts.keys()
+        ab = a.split('&&')
+        ip = ab[-1]
+        resolver = a[0]
+        cnames = hosts[a]['cnames']
+        port = hosts[a]['ports']
+        print '> IP: ' + ip
+        print '> A Record: ' + ab[0]
+        print 'CNAMES: '
+        for b in hosts[a]['cnames']:
+            print '\t ->' + b
+        print 'Ports: '
+        for b in hosts[a]['ports']:
+            print '\t ->' + b
 
+        print '\n'
 main()
