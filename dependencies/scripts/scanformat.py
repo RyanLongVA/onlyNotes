@@ -1,7 +1,11 @@
+#This is just a ugly but compact (enough) and full output meant for me to iterate through
+
 import sys
 import os
 import pdb
 import re
+
+class BreakIt(Exception): pass
 
 def main():
     if len(sys.argv) <= 1:
@@ -18,7 +22,7 @@ def main():
         exit()
 
     hosts = {}
-    # scan formatting
+    # scanFile formatting
     scanContent = scanFile.readlines()
     scanContent = [x.strip() for x in scanContent]
     for a in scanContent:
@@ -26,12 +30,26 @@ def main():
             a = a.split('()')
             fhost = a[0].replace('Host: ', '').replace(' ', '')
             fports = a[1].replace('Ports: ', '').replace('Port: ', '')
+            # looking if the hosts exists
             if fhost not in hosts:
                 hosts[fhost] = {'ports': [fports], 'cnames': []}
             else:
-                hosts[fhost]['ports'] += [fports]
+                # looking if the port exists
 
-    #  ipformatting
+                # Note: Yes I'm negating some of the longer banners or 
+                # service returns, but most of the information is just 
+                # repetitive and destroys what cleanliness I have
+
+                cports = re.findall(r'([\d]*[\d])', fports)[0]
+                try:
+                    for b in hosts[fhost]['ports']:
+                        if cports == re.findall(r'([\d]*[\d])', fports)[0]:
+                            raise BreakIt
+                    hosts[fhost]['ports'] += [fports]
+                except BreakIt:
+                    pass
+
+    # ipformatting
     # for the keys in the host dictionary iterate through to find cnames and continue up to correlate other cnames (chains)
     for a in ipFile:
         a = a.split(':')
