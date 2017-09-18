@@ -2,6 +2,7 @@ import sys
 import subprocess
 import optparse
 import os
+import pdb
 
 def openCount():
     while True:
@@ -9,7 +10,7 @@ def openCount():
         return a
 
 def main():
-    parser = optparse.OptionParser('usage%prog ' + '-u <url list>')
+    parser = optparse.OptionParser('python file.py ' '-u <url list>')
     parser.add_option('-u', dest='listLoc', type='string', help='specifies url list')
     (options, args) = parser.parse_args()
     if not (options.listLoc):
@@ -39,6 +40,9 @@ def main():
         devnull = open(os.devnull, 'r')
         for x in xrange(len(data[cur:lineReader])):
             subprocess.call("chromium-browser " + data[cur+x], shell=True)
+        for x in xrange(len(data[cur:lineReader])):
+            print str(x) + ': ' + data[cur+x]
+        print '\n'
         if cur>length-1:
             print "Finished"
             exit()
